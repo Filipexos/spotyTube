@@ -20,14 +20,16 @@ print("authorization_token found: " + authorization_token)
 headers = {
         "Authorization": "Bearer " + authorization_token
         }
-r = requests.get('https://api.spotify.com/v1/playlists/'+spotify_playlist, headers=headers)
-data = r.json()
-
-for i in data['tracks']['items']:
-    search = i['track']['name']
-    for j in i['track']['artists']:
-        search = search + " " + j['name']
-    print(search)
-    res = yt.search(search, 'songs', limit = 1)
-    print("id found: " + res[0]['videoId'])
-    yt.add_playlist_items(ytmusic_playlist, [res[0]['videoId']])
+spotifyurl = f'https://api.spotify.com/v1/playlists/{spotify_playlist}/tracks'
+while spotifyurl:
+    r = requests.get(spotifyurl, headers=headers)
+    data = r.json()
+    for i in data['items']:
+        search = i['track']['name']
+        for j in i['track']['artists']:
+            search = search + " " + j['name']
+        print(search)
+        res = yt.search(search, 'songs', limit = 1)
+        print("id found: " + res[0]['videoId'])
+        yt.add_playlist_items(ytmusic_playlist, [res[0]['videoId']])
+    spotifyurl = data['next']
